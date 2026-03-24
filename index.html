@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anostus GitHub Pages Index</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --link: #93c5fd;
+      --accent: #22c55e;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 20px 72px;
+    }
+
+    header {
+      margin-bottom: 32px;
+      padding: 28px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: rgba(17, 24, 39, 0.8);
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.15;
+    }
+
+    .intro {
+      margin: 0;
+      color: var(--muted);
+      max-width: 70ch;
+    }
+
+    .toc {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .toc a {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--link);
+      text-decoration: none;
+      border: 1px solid var(--border);
+    }
+
+    section {
+      margin-top: 28px;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 1.45rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    article {
+      height: 100%;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      background: rgba(17, 24, 39, 0.92);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    article h3 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+      line-height: 1.3;
+    }
+
+    article p {
+      margin: 0 0 12px;
+      color: var(--text);
+    }
+
+    .repo {
+      display: inline-block;
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+      color: var(--muted);
+      letter-spacing: 0.01em;
+    }
+
+    a {
+      color: var(--link);
+    }
+
+    .visit {
+      display: inline-block;
+      text-decoration: none;
+      color: #0b1220;
+      background: var(--accent);
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    footer {
+      margin-top: 34px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.92em;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Anostus GitHub Pages Master Index</h1>
+      <p class="intro">
+        A single-page index of the GitHub Pages sites described in this chat, grouped by purpose and linked directly.
+      </p>
+      <nav class="toc" aria-label="Sections">
+        <a href="#tools">Tools &amp; Utilities</a>
+        <a href="#ttrpg">TTRPG / GM Tools</a>
+        <a href="#other">Other / Experimental</a>
+      </nav>
+    </header>
+
+    <section id="tools">
+      <h2>Tools &amp; Utilities</h2>
+      <div class="grid">
+        <article>
+          <span class="repo">Repo: <code>pdfcompress</code></span>
+          <h3>PDF Compress</h3>
+          <p>A local, in-browser PDF image compressor that keeps page layout, text, and vector graphics intact while recompressing embedded raster images.</p>
+          <a class="visit" href="https://anostus.github.io/pdfcompress/">Open site</a>
+        </article>
+        <article>
+          <span class="repo">Repo: <code>pdfsplitmerge</code></span>
+          <h3>PDF Toolkit</h3>
+          <p>A browser-based PDF utility for splitting PDFs at chosen page breaks, extracting selected pages, and merging full files or page ranges into a new PDF.</p>
+          <a class="visit" href="https://anostus.github.io/pdfsplitmerge/">Open site</a>
+        </article>
+        <article>
+          <span class="repo">Repo: <code>Nozemaster</code></span>
+          <h3>Sentence Sprint Plus</h3>
+          <p>A Spanish↔English whole-sentence practice app with Tatoeba decks, accent helpers, review, and session goals.</p>
+          <a class="visit" href="https://anostus.github.io/Nozemaster/">Open site</a>
+        </article>
+        <article>
+          <span class="repo">Repo: <code>Cubeo</code></span>
+          <h3>Cubeo Manual Play</h3>
+          <p>An interactive manual-play board and dice page with adjustable die size, undo, and reset controls.</p>
+          <a class="visit" href="https://anostus.github.io/Cubeo/">Open site</a>
+        </article>
+        <article>
+          <span class="repo">Repo: <code>hive</code></span>
+          <h3>Hive Manual Play</h3>
+          <p>An interactive board for Hive with tile sizing plus save and load controls.</p>
+          <a class="visit" href="https://anostus.github.io/hive/">Open site</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="ttrpg">
+      <h2>TTRPG / GM Tools</h2>
+      <div class="grid">
+        <article>
+          <span class="repo">Repo: <code>dmtools</code></span>
+          <h3>DM Toolbox</h3>
+          <p>A DM toolbox with random generators for towns, adventures, dungeons, dungeon stocking, NPCs, and more.</p>
+          <a class="visit" href="https://anostus.github.io/dmtools/">Open site</a>
+        </article>
+        <article>
+          <span class="repo">Repo: <code>DnDRedditTimeCapsule</code></span>
+          <h3>D&amp;D Video Post Time Machine</h3>
+          <p>A tool that pulls posts from the same month 12 years earlier across selected D&amp;D subreddits, filters for likely video posts, and ranks them by score.</p>
+          <a class="visit" href="https://anostus.github.io/DnDRedditTimeCapsule/">Open site</a>
+        </article>
+        <article>
+          <span class="repo">Repo: <code>5RoomDungeon_v2</code></span>
+          <h3>Five-Room Dungeon Generator</h3>
+          <p>A browser-based five-room dungeon generator with reproducible seeded runs plus text, JSON, and CSV export.</p>
+          <a class="visit" href="https://anostus.github.io/5RoomDungeon_v2/">Open site</a>
+        </article>
+        <article>
+          <span class="repo">Repo: <code>SimpleVTT</code></span>
+          <h3>SimpleVTT</h3>
+          <p>A two-screen VTT and DM fog-of-war tool with map loading, player window, reveal and hide tools, zoom, rotation, and a small-screen battlemap mode.</p>
+          <a class="visit" href="https://anostus.github.io/SimpleVTT/">Open site</a>
+        </article>
+        <article>
+          <span class="repo">Repo: <code>RuinGenerator</code></span>
+          <h3>Numenera Ruin Generator</h3>
+          <p>A ruin generator for Numenera 2nd Edition.</p>
+          <a class="visit" href="https://anostus.github.io/RuinGenerator/">Open site</a>
+        </article>
+        <article>
+          <span class="repo">Repo: <code>MazeRatsRandomizers</code></span>
+          <h3>Maze Rats Randomizers</h3>
+          <p>Generators for the d66 tables from Maze Rats, with reroll-all and reroll-by-category controls.</p>
+          <a class="visit" href="https://anostus.github.io/MazeRatsRandomizers/">Open site</a>
+        </article>
+        <article>
+          <span class="repo">Repo: <code>MonsterCR</code></span>
+          <h3>Monster Quick-Stats Generator</h3>
+          <p>A generator for building monsters by challenge rating, role, boss tier, multiattack, and template.</p>
+          <a class="visit" href="https://anostus.github.io/MonsterCR/">Open site</a>
+        </article>
+        <article>
+          <span class="repo">Repo: <code>placebomancy_oracle</code></span>
+          <h3>Placebomancy Oracle</h3>
+          <p>A simple random oracle tool.</p>
+          <a class="visit" href="https://anostus.github.io/placebomancy_oracle/">Open site</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="other">
+      <h2>Other / Experimental</h2>
+      <div class="grid">
+        <article>
+          <span class="repo">Repo: <code>virtual_lararium</code></span>
+          <h3>Virtual Lararium</h3>
+          <p>A virtual lararium with toggles for candles, incense, offerings, and music.</p>
+          <a class="visit" href="https://anostus.github.io/virtual_lararium/">Open site</a>
+        </article>
+        <article>
+          <span class="repo">Repo: <code>homo-faras-aferon</code></span>
+          <h3>Homo Faras Aferon</h3>
+          <p>An Esperanto word/game page built around a target word, allowed morphemes, and play rules.</p>
+          <a class="visit" href="https://anostus.github.io/homo-faras-aferon/">Open site</a>
+        </article>
+      </div>
+    </section>
+
+    <footer>
+      Built from the site descriptions collected in this chat. You can upload this file to a repo or use it as a starting point for a homepage/index page.
+    </footer>
+  </div>
+</body>
+</html>
