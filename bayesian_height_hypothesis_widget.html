@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bayesian Height Hypothesis Playground</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #172033;
+      --text: #e5e7eb;
+      --muted: #a7b0c0;
+      --line: rgba(255,255,255,.13);
+      --accent: #93c5fd;
+      --accent-2: #fbbf24;
+      --good: #86efac;
+      --warn: #fdba74;
+      --bad: #fca5a5;
+      --shadow: 0 20px 60px rgba(0,0,0,.35);
+      --radius: 20px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top left, rgba(147,197,253,.16), transparent 32rem), var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+    main { max-width: 1240px; margin: 0 auto; padding: 28px; }
+    header {
+      display: grid;
+      grid-template-columns: 1.4fr .9fr;
+      gap: 20px;
+      align-items: stretch;
+      margin-bottom: 20px;
+    }
+    h1 { margin: 0 0 10px; font-size: clamp(1.8rem, 3vw, 3rem); letter-spacing: -.04em; }
+    h2 { margin: 0 0 14px; font-size: 1.05rem; color: #fff; }
+    p { margin: 0; }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+    .note {
+      color: var(--muted);
+      font-size: .95rem;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 12px;
+      margin: 0 8px 8px 0;
+      background: rgba(255,255,255,.045);
+      color: var(--muted);
+      font-size: .88rem;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(340px, 460px) 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    .controls {
+      display: grid;
+      gap: 14px;
+      position: sticky;
+      top: 16px;
+    }
+    .control-group { padding: 18px; background: rgba(17,24,39,.72); }
+    .control {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px 14px;
+      align-items: center;
+      padding: 11px 0;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+    .control:first-of-type { border-top: 0; }
+    label { font-weight: 650; font-size: .92rem; }
+    .hint { grid-column: 1 / -1; color: var(--muted); font-size: .82rem; margin-top: -4px; }
+    output {
+      font-variant-numeric: tabular-nums;
+      color: #fff;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 999px;
+      padding: 4px 9px;
+      min-width: 70px;
+      text-align: right;
+      font-size: .86rem;
+    }
+    input[type="range"] { grid-column: 1 / -1; width: 100%; accent-color: var(--accent); }
+    .results { display: grid; gap: 20px; }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .metric {
+      background: rgba(255,255,255,.055);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      padding: 16px;
+      min-height: 132px;
+    }
+    .metric .label { color: var(--muted); font-size: .86rem; margin-bottom: 8px; }
+    .metric .value { font-size: clamp(1.7rem, 3vw, 2.55rem); font-weight: 800; letter-spacing: -.04em; }
+    .metric .sub { color: var(--muted); font-size: .84rem; margin-top: 8px; }
+    .bar {
+      height: 12px;
+      border-radius: 99px;
+      background: rgba(255,255,255,.08);
+      overflow: hidden;
+      margin-top: 12px;
+    }
+    .bar > span { display: block; height: 100%; width: 50%; background: linear-gradient(90deg, var(--accent), var(--good)); border-radius: inherit; }
+    .interpretation {
+      font-size: 1.05rem;
+      color: #f8fafc;
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(147,197,253,.08);
+      border-radius: 18px;
+    }
+    svg { width: 100%; height: auto; display: block; overflow: visible; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 680px; font-size: .92rem; }
+    th, td { text-align: right; padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,.09); font-variant-numeric: tabular-nums; }
+    th:first-child, td:first-child { text-align: left; color: var(--text); }
+    th { color: var(--muted); font-weight: 700; }
+    .small { font-size: .84rem; color: var(--muted); }
+    .formula {
+      display: grid;
+      gap: 10px;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+    code {
+      color: #dbeafe;
+      background: rgba(147,197,253,.10);
+      border: 1px solid rgba(147,197,253,.16);
+      border-radius: 8px;
+      padding: 2px 6px;
+    }
+    @media (max-width: 980px) {
+      header, .layout { grid-template-columns: 1fr; }
+      .controls { position: static; }
+      .summary-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <section class="card">
+        <h1>Bayesian Height Hypothesis Playground</h1>
+        <p class="note">A toy model for hypothetical Populations A, B, and C. Heights are expressed as z-scores relative to Population C, whose observed and genetic mean is set to 0. This is for sensitivity analysis only, not for drawing conclusions about real human groups.</p>
+        <div style="margin-top:16px">
+          <span class="pill">H1: A genetic mean = C; A short due to environment</span>
+          <span class="pill">H2: A and B have below-C latent genetic height means</span>
+          <span class="pill">B = founder source from A + C admixture + uncertainty</span>
+        </div>
+      </section>
+      <section class="card formula">
+        <h2>Model sketch</h2>
+        <p><code>Observed z = genetic z − environmental penalty + error</code></p>
+        <p><code>B genetic z = (1 − admixture) × A-founder source + admixture × C-source</code></p>
+        <p><code>Posterior odds = prior odds × likelihood ratio</code></p>
+        <p class="small">H2 marginalizes over an uncertain A genetic shortfall rather than only using its best-fitting value.</p>
+      </section>
+    </header>
+
+    <div class="layout">
+      <aside class="controls">
+        <section class="card control-group">
+          <h2>Observed data and priors</h2>
+          <div class="control"><label for="obsA">Observed Population A height</label><output id="obsAOut"></output><input id="obsA" type="range" min="-3.5" max="1" step="0.05" value="-2"><div class="hint">Default: A is 2 SD below C.</div></div>
+          <div class="control"><label for="obsB">Observed Population B height</label><output id="obsBOut"></output><input id="obsB" type="range" min="-3.5" max="1" step="0.05" value="-1"><div class="hint">Default: B is 1 SD below C.</div></div>
+          <div class="control"><label for="priorH1">Prior probability of H1</label><output id="priorH1Out"></output><input id="priorH1" type="range" min="1" max="99" step="1" value="50"><div class="hint">Your pre-data belief before seeing the A/B height observations.</div></div>
+        </section>
+
+        <section class="card control-group">
+          <h2>Environment</h2>
+          <div class="control"><label for="envA">A nutrition + disease height penalty</label><output id="envAOut"></output><input id="envA" type="range" min="0" max="3.5" step="0.05" value="1.20"><div class="hint">Higher values mean more of A's short observed height is environmental.</div></div>
+          <div class="control"><label for="envB">B residual environmental penalty</label><output id="envBOut"></output><input id="envB" type="range" min="-0.5" max="1.5" step="0.05" value="0.10"><div class="hint">Can be near zero for wealthy conditions; negative means B's environment boosts height relative to C.</div></div>
+        </section>
+
+        <section class="card control-group">
+          <h2>B founder and admixture scenario</h2>
+          <div class="control"><label for="founderPct">B derived from A percentile</label><output id="founderPctOut"></output><input id="founderPct" type="range" min="1" max="50" step="1" value="20"><div class="hint">Lower percentile means the founding subpopulation of A was shorter.</div></div>
+          <div class="control"><label for="subpopSd">A subpopulation genetic spread</label><output id="subpopSdOut"></output><input id="subpopSd" type="range" min="0" max="1.2" step="0.05" value="0.45"><div class="hint">How much subpopulation genetic means can differ inside A, measured in C SD units.</div></div>
+          <div class="control"><label for="founderSignal">Founder phenotype → genetic conversion</label><output id="founderSignalOut"></output><input id="founderSignal" type="range" min="0" max="1" step="0.05" value="0.60"><div class="hint">0 means the low founder percentile was entirely environmental; 1 means fully genetic.</div></div>
+          <div class="control"><label for="admixture">Population C admixture in B</label><output id="admixtureOut"></output><input id="admixture" type="range" min="0" max="60" step="1" value="20"><div class="hint">Default matches the 20% C ancestry in B.</div></div>
+          <div class="control"><label for="cSourcePct">Height percentile of C contributors</label><output id="cSourcePctOut"></output><input id="cSourcePct" type="range" min="50" max="99" step="1" value="80"><div class="hint">Lets you model B receiving above-average-height C ancestry.</div></div>
+          <div class="control"><label for="cSubpopSd">C contributor genetic spread</label><output id="cSubpopSdOut"></output><input id="cSubpopSd" type="range" min="0" max="1.2" step="0.05" value="0.35"><div class="hint">How much high-percentile C contributors differ genetically from average C.</div></div>
+        </section>
+
+        <section class="card control-group">
+          <h2>Uncertainty and H2 prior</h2>
+          <div class="control"><label for="sigma">General model uncertainty</label><output id="sigmaOut"></output><input id="sigma" type="range" min="0.05" max="1.5" step="0.05" value="0.45"><div class="hint">Includes measurement error, model misspecification, age/sex composition, and unmeasured structure.</div></div>
+          <div class="control"><label for="drift">Extra B drift / founder uncertainty</label><output id="driftOut"></output><input id="drift" type="range" min="0" max="1.5" step="0.05" value="0.25"><div class="hint">Additional uncertainty for the small 50,000-person derived population.</div></div>
+          <div class="control"><label for="h2Mean">H2 prior mean A genetic shortfall</label><output id="h2MeanOut"></output><input id="h2Mean" type="range" min="0.05" max="3" step="0.05" value="0.80"><div class="hint">Under H2, A's optimal-environment mean is below C by this many SD before seeing the data.</div></div>
+          <div class="control"><label for="h2Sd">H2 prior SD for genetic shortfall</label><output id="h2SdOut"></output><input id="h2Sd" type="range" min="0.05" max="2" step="0.05" value="0.60"><div class="hint">Higher values make H2 more flexible but also spread its prior mass.</div></div>
+        </section>
+      </aside>
+
+      <section class="results">
+        <section class="card">
+          <h2>Bayesian result under current settings</h2>
+          <div class="summary-grid">
+            <div class="metric">
+              <div class="label">Posterior probability of H1</div>
+              <div class="value" id="postH1">—</div>
+              <div class="bar"><span id="postBar"></span></div>
+              <div class="sub">H2 is the remainder.</div>
+            </div>
+            <div class="metric">
+              <div class="label">Bayes factor</div>
+              <div class="value" id="bf">—</div>
+              <div class="sub" id="bfSub">—</div>
+            </div>
+            <div class="metric">
+              <div class="label">H2 posterior mean A genetic shortfall</div>
+              <div class="value" id="h2PostMean">—</div>
+              <div class="sub">After marginalizing over H2 shortfall values.</div>
+            </div>
+          </div>
+          <div class="interpretation" id="interpretation" style="margin-top:16px">—</div>
+        </section>
+
+        <section class="card">
+          <h2>Z-score map</h2>
+          <div id="chart"></div>
+          <p class="small">Points show observed values and model-predicted observed values. The axis is in SD units relative to Population C.</p>
+        </section>
+
+        <section class="card">
+          <h2>Predicted values and residuals</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Quantity</th><th>H1</th><th>H2 posterior average</th><th>Observed / derived</th></tr></thead>
+              <tbody id="detailTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card formula">
+          <h2>What the sliders mean</h2>
+          <p><strong>Founder percentile:</strong> converted into a normal z-score and scaled by subpopulation genetic spread and phenotype-to-genetic conversion. Example: a 20th percentile source has a negative founder offset.</p>
+          <p><strong>Admixture:</strong> B's genetic mean is a weighted average of the founder source from A and the C-contributor source.</p>
+          <p><strong>Environment:</strong> subtracts from genetic potential to generate observed height. Raising A's environmental penalty tends to help H1; lowering it tends to help H2.</p>
+          <p><strong>Uncertainty:</strong> larger uncertainty makes the posterior less extreme. Small uncertainty values can make this toy model overconfident.</p>
+          <p><strong>Important limitation:</strong> a real analysis would need representative genotype data, measured childhood environments, sex and age stratification, migration/admixture history, uncertainty in phenotypic SDs, and explicit causal assumptions. This widget deliberately avoids claims about real populations.</p>
+        </section>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const ids = ["obsA","obsB","priorH1","envA","envB","founderPct","subpopSd","founderSignal","admixture","cSourcePct","cSubpopSd","sigma","drift","h2Mean","h2Sd"];
+    const pretty = {
+      obsA: v => zfmt(v), obsB: v => zfmt(v), priorH1: v => v + "%",
+      envA: v => zfmt(v), envB: v => zfmt(v), founderPct: v => v + "th",
+      subpopSd: v => zfmt(v), founderSignal: v => Math.round(v*100) + "%",
+      admixture: v => v + "%", cSourcePct: v => v + "th", cSubpopSd: v => zfmt(v),
+      sigma: v => zfmt(v), drift: v => zfmt(v), h2Mean: v => zfmt(v), h2Sd: v => zfmt(v)
+    };
+    function $(id) { return document.getElementById(id); }
+    function val(id) { return Number($(id).value); }
+    function zfmt(x) {
+      const n = Number(x);
+      const sign = n > 0 ? "+" : "";
+      return sign + n.toFixed(2) + " SD";
+    }
+    function pctfmt(x) { return (100*x).toFixed(x < .1 || x > .9 ? 1 : 0) + "%"; }
+    function logistic(x) {
+      if (x > 35) return 1;
+      if (x < -35) return 0;
+      return 1 / (1 + Math.exp(-x));
+    }
+    function normalLogPdf(x, mu, sigma) {
+      const z = (x - mu) / sigma;
+      return -0.5 * z * z - Math.log(sigma) - 0.5 * Math.log(2 * Math.PI);
+    }
+    function logSumExp(arr) {
+      const m = Math.max(...arr);
+      if (!isFinite(m)) return m;
+      let s = 0;
+      for (const x of arr) s += Math.exp(x - m);
+      return m + Math.log(s);
+    }
+    function invNorm(p) {
+      if (p <= 0) return -Infinity;
+      if (p >= 1) return Infinity;
+      const a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02, 1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+      const b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01];
+      const c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+      const d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00, 3.754408661907416e+00];
+      const pLow = 0.02425;
+      let q, r;
+      if (p < pLow) {
+        q = Math.sqrt(-2 * Math.log(p));
+        return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+      }
+      if (p <= 1 - pLow) {
+        q = p - 0.5;
+        r = q * q;
+        return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5]) * q / (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+      }
+      q = Math.sqrt(-2 * Math.log(1 - p));
+      return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+    }
+
+    function compute() {
+      ids.forEach(id => { $(id + "Out").textContent = pretty[id](val(id)); });
+
+      const obsA = val("obsA"), obsB = val("obsB");
+      const priorH1 = val("priorH1") / 100;
+      const envA = val("envA"), envB = val("envB");
+      const founderPct = val("founderPct") / 100;
+      const subpopSd = val("subpopSd");
+      const founderSignal = val("founderSignal");
+      const admixture = val("admixture") / 100;
+      const cSourcePct = val("cSourcePct") / 100;
+      const cSubpopSd = val("cSubpopSd");
+      const sigma = val("sigma");
+      const drift = val("drift");
+      const h2Mean = val("h2Mean"), h2Sd = val("h2Sd");
+
+      const founderZ = invNorm(founderPct);
+      const cSourceZ = invNorm(cSourcePct);
+      const founderOffset = founderZ * subpopSd * founderSignal;
+      const cContributor = cSourceZ * cSubpopSd;
+      const sigmaA = sigma;
+      const sigmaB = Math.sqrt(sigma * sigma + drift * drift);
+
+      function bGenFromA(aGen) {
+        const founderSource = aGen + founderOffset;
+        return (1 - admixture) * founderSource + admixture * cContributor;
+      }
+      function logLik(predA, predB) {
+        return normalLogPdf(obsA, predA, sigmaA) + normalLogPdf(obsB, predB, sigmaB);
+      }
+
+      const h1 = {
+        aGen: 0,
+        bGen: bGenFromA(0)
+      };
+      h1.predA = h1.aGen - envA;
+      h1.predB = h1.bGen - envB;
+      h1.ll = logLik(h1.predA, h1.predB);
+
+      const grid = [];
+      const priorLogs = [];
+      const weightLogs = [];
+      const N = 700;
+      const minS = 0.01, maxS = 3.5;
+      for (let i = 0; i < N; i++) {
+        const s = minS + (maxS - minS) * i / (N - 1);
+        const aGen = -s;
+        const bGen = bGenFromA(aGen);
+        const predA = aGen - envA;
+        const predB = bGen - envB;
+        const lp = normalLogPdf(s, h2Mean, h2Sd);
+        const ll = logLik(predA, predB);
+        grid.push({s, aGen, bGen, predA, predB, ll, lp});
+        priorLogs.push(lp);
+        weightLogs.push(lp + ll);
+      }
+      const logPriorNorm = logSumExp(priorLogs);
+      const logWeighted = logSumExp(weightLogs);
+      const h2MarginalLL = logWeighted - logPriorNorm;
+      let h2PostS = 0, h2PredA = 0, h2PredB = 0, h2BGen = 0;
+      for (let i = 0; i < grid.length; i++) {
+        const w = Math.exp(weightLogs[i] - logWeighted);
+        h2PostS += grid[i].s * w;
+        h2PredA += grid[i].predA * w;
+        h2PredB += grid[i].predB * w;
+        h2BGen += grid[i].bGen * w;
+      }
+      const h2 = { aGen: -h2PostS, bGen: h2BGen, predA: h2PredA, predB: h2PredB, ll: h2MarginalLL };
+
+      const delta = h1.ll - h2.ll;
+      const logPriorOdds = Math.log(priorH1 / (1 - priorH1));
+      const postH1 = logistic(logPriorOdds + delta);
+      const log10BF = delta / Math.log(10);
+
+      $("postH1").textContent = pctfmt(postH1);
+      $("postBar").style.width = (postH1 * 100).toFixed(2) + "%";
+      $("h2PostMean").textContent = zfmt(h2PostS).replace("+", "");
+      let bfText;
+      if (Math.abs(log10BF) < 3) bfText = Math.pow(10, log10BF).toFixed(2) + "×";
+      else bfText = "10^" + log10BF.toFixed(2);
+      $("bf").textContent = bfText;
+      $("bfSub").textContent = delta >= 0 ? "Evidence favors H1 over H2" : "Evidence favors H2 over H1";
+
+      const residual1 = Math.sqrt((obsA - h1.predA)**2 + (obsB - h1.predB)**2);
+      const residual2 = Math.sqrt((obsA - h2.predA)**2 + (obsB - h2.predB)**2);
+      let verdict;
+      if (postH1 > .67) verdict = "Under these settings, the model leans toward H1: the environmental penalty assigned to A plus the founder/admixture scenario makes the observed A/B pattern more expected under H1.";
+      else if (postH1 < .33) verdict = "Under these settings, the model leans toward H2: the observed A/B pattern is better explained by a latent A genetic shortfall plus environment than by environment alone for A.";
+      else verdict = "Under these settings, the model is not decisive. The result is sensitive to the environmental penalty, founder genetic conversion, and the uncertainty sliders.";
+      verdict += ` Residual distance: H1 ${residual1.toFixed(2)} SD-units vs H2 ${residual2.toFixed(2)} SD-units.`;
+      $("interpretation").textContent = verdict;
+
+      renderChart({obsA, obsB, h1, h2});
+      renderTable({obsA, obsB, h1, h2, founderOffset, cContributor, founderZ, cSourceZ, sigmaA, sigmaB, log10BF, postH1});
+    }
+
+    function renderChart({obsA, obsB, h1, h2}) {
+      const min = -4, max = 1.5, width = 900, height = 310;
+      const left = 95, right = 40;
+      const scale = z => left + (z - min) / (max - min) * (width - left - right);
+      const ticks = [-4,-3,-2,-1,0,1];
+      const rows = [
+        {y: 70, label: "Observed", pts: [{z: 0, name:"C", cls:"c"}, {z: obsB, name:"B", cls:"b"}, {z: obsA, name:"A", cls:"a"}]},
+        {y: 155, label: "H1 predicted", pts: [{z: 0, name:"C", cls:"c"}, {z: h1.predB, name:"B", cls:"b"}, {z: h1.predA, name:"A", cls:"a"}]},
+        {y: 240, label: "H2 predicted", pts: [{z: 0, name:"C", cls:"c"}, {z: h2.predB, name:"B", cls:"b"}, {z: h2.predA, name:"A", cls:"a"}]}
+      ];
+      const tickLines = ticks.map(t => `<line x1="${scale(t)}" x2="${scale(t)}" y1="35" y2="264" stroke="rgba(255,255,255,.10)"/><text x="${scale(t)}" y="292" text-anchor="middle" fill="#a7b0c0" font-size="13">${t}</text>`).join("");
+      const rowLines = rows.map(r => `<line x1="${left}" x2="${width-right}" y1="${r.y}" y2="${r.y}" stroke="rgba(255,255,255,.12)"/><text x="15" y="${r.y+5}" fill="#cbd5e1" font-size="14" font-weight="700">${r.label}</text>`).join("");
+      const points = rows.flatMap(r => r.pts.map(p => {
+        const colors = {a:"#fca5a5", b:"#fbbf24", c:"#93c5fd"};
+        const x = scale(Math.max(min, Math.min(max, p.z)));
+        const clipped = p.z < min || p.z > max;
+        return `<g><circle cx="${x}" cy="${r.y}" r="9" fill="${colors[p.cls]}" opacity=".95"/><text x="${x}" y="${r.y-16}" text-anchor="middle" fill="#f8fafc" font-size="13" font-weight="800">${p.name}</text><text x="${x}" y="${r.y+30}" text-anchor="middle" fill="#a7b0c0" font-size="12">${clipped ? "off-scale" : p.z.toFixed(2)}</text></g>`;
+      })).join("");
+      $("chart").innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Z-score map of observed and predicted heights"><rect x="0" y="0" width="${width}" height="${height}" rx="18" fill="rgba(255,255,255,.035)"/>${tickLines}${rowLines}<line x1="${scale(0)}" x2="${scale(0)}" y1="28" y2="270" stroke="#93c5fd" stroke-width="2" opacity=".85"/>${points}<text x="${width-right}" y="292" text-anchor="end" fill="#a7b0c0" font-size="13">z-score relative to C</text></svg>`;
+    }
+
+    function renderTable({obsA, obsB, h1, h2, founderOffset, cContributor, founderZ, cSourceZ, sigmaA, sigmaB, log10BF, postH1}) {
+      const rows = [
+        ["A latent genetic mean", zfmt(h1.aGen), zfmt(h2.aGen), "—"],
+        ["B latent genetic mean", zfmt(h1.bGen), zfmt(h2.bGen), "—"],
+        ["Predicted observed A", zfmt(h1.predA), zfmt(h2.predA), zfmt(obsA)],
+        ["Predicted observed B", zfmt(h1.predB), zfmt(h2.predB), zfmt(obsB)],
+        ["A residual: observed − predicted", zfmt(obsA - h1.predA), zfmt(obsA - h2.predA), "0 by definition"],
+        ["B residual: observed − predicted", zfmt(obsB - h1.predB), zfmt(obsB - h2.predB), "0 by definition"],
+        ["Founder offset from A source", zfmt(founderOffset), zfmt(founderOffset), `percentile z = ${founderZ.toFixed(2)}`],
+        ["C contributor offset", zfmt(cContributor), zfmt(cContributor), `percentile z = ${cSourceZ.toFixed(2)}`],
+        ["Likelihood width used for A / B", zfmt(sigmaA), zfmt(sigmaB), "larger = less decisive"],
+        ["log10 Bayes factor H1:H2", log10BF.toFixed(2), log10BF.toFixed(2), `posterior H1 = ${pctfmt(postH1)}`]
+      ];
+      $("detailTable").innerHTML = rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("");
+    }
+
+    ids.forEach(id => $(id).addEventListener("input", compute));
+    compute();
+  </script>
+</body>
+</html>
